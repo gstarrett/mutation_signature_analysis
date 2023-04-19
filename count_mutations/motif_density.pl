@@ -1,15 +1,18 @@
 #!/usr/bin/perl -w
 use strict;
 use Getopt::Long;
+use Bio::SeqIO;
 
 my $in;
 my $win=600;
 my $int=60;
 my $kmer=2;
+my $type="fasta";
 
 GetOptions ("window=i" => \$win,
 			"interval=i" => \$int,
 			"file=s" => \$in,
+			"type=s" => \$type,
 			"kmer=i" => \$kmer
 ) or die("Error in command line arguments\n");
 
@@ -21,11 +24,19 @@ my $trint = calcMotifs($kmer+1);
 my %posHash;
 #my $lnum = 0;
 
-open(IN, "< $in");
-while (my $line = <IN>) {
-	chomp($line);
-	my @f = split("\t",$line);
-	my $seq = $f[4];
+#open(IN, "< $in");
+my $inseq = Bio::SeqIO->new(-file => $in, -format => $type);
+
+#while (my $line = <IN>) {
+while (my $entry = $inseq->next_seq) {
+	#chomp($line);
+	#my @f = split("\t",$line);
+	#my $seq = $f[4];
+	
+	my $sample = $entry->id;
+	my $seq = $entry->seq();
+	$seq = uc $seq;
+	
 	my $pos = 0;
 	until ($pos+$win > length($seq)) {
 		my %kmercount;
@@ -48,7 +59,7 @@ while (my $line = <IN>) {
 		}
 		for my $key (keys %kmercount) {
 			unless ($key =~ /-/) {
-				print join("\t", @f[0..3,13 ], $pos, $key, $kmercount{$key}),"\n";
+				print join("\t", $sample, $pos, $key, $kmercount{$key}),"\n";
 			}
 		}
 		$pos += $int;

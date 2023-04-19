@@ -6,7 +6,7 @@ my $mutsin =shift;
 my $annin = shift;
 my $other = shift;
 
-my @possMuts = ("C>T","C>A","C>G","G>A","G>C","G>T");
+my @possMuts = ("C>T","C>A","C>G","G>A","G>C","G>T","A>T","A>C","A>G","T>A","T>C","T>G");
 
 my %normCount;
 my %annHash;
